@@ -11,6 +11,7 @@ var buttons;
 var activeButtons = [];
 var inactiveButtons = [];
 var freq = 0;
+var score = 0;
 
 function setup(){
     let canvas = createCanvas(600,700);
@@ -40,6 +41,8 @@ function setup(){
 function draw(){
     clear(0,0,width,height);
     if(!lost){
+        fill("BLACK");
+        text(score, width/2, 40)
         freqBar();
         for(row of buttons){
             for(button of row){
@@ -53,12 +56,14 @@ function draw(){
 }
 
 function freqBar(){
+    fill("BLACK");
+    text(Math.ceil(freq/100), 0, 70)
     fill("WHITE")
     freq = (freq > 0)? freq-2: 0;
-    rect(10,80,200,10);
+    rect(0,80,200,10);
     noStroke();
     fill("BLACK");
-    rect(10,80,(freq%100)*2, 10);
+    rect(0,80,(freq%100)*2, 10);
 }
 
 function mousePressed(){
@@ -67,8 +72,9 @@ function mousePressed(){
             let y = Math.floor((mouseY-buttonsStartHeight)/buttonHeight);
             let x = Math.floor(mouseX/buttonWidth);
             if(buttons[y][x].state == false){
-                lost = true;
+                lose();
             } else {
+                score += (freq <= 500)? Math.ceil(freq/100): 5;
                 freq += 30;
                 buttons[y][x].click();
                 buttons[y][x].draw();
@@ -78,6 +84,12 @@ function mousePressed(){
             lost = false;
         }
     }
+}
+
+function lose(){
+    lost = true;
+    freq = 0;
+    score = 0;
 }
 
 function newActive(index){
