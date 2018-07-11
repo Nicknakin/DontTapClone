@@ -51,15 +51,15 @@ function draw(){
         }
     } else {
         fill("red");
-        rect(0,0,width,height);
+        rect(0,buttonsStartHeight,width,height);
     }
 }
 
 function freqBar(){
     fill("BLACK");
-    text(Math.ceil(freq/100), 0, 70)
+    text((freq < 500)? Math.ceil(freq/100): 5, 0, 70)
     fill("WHITE")
-    freq = (freq > 0)? freq-2: 0;
+    freq = (freq > 0)? freq-1: 0;
     rect(0,80,200,10);
     noStroke();
     fill("BLACK");

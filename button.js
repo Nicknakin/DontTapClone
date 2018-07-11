@@ -16,5 +16,6 @@ class FastButton{
 
     click(){
         this.state = !this.state;
+        
     }
 }
