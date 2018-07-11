@@ -1,5 +1,5 @@
-var defaultColor = "CYAN";
-var alternateColor = "ORANGE";
+var defaultColor = "WHITE";
+var alternateColor = "BLACK";
 var startTime = new Date();
 var lost = false;
 var buttonsStartHeight = 100;
@@ -8,6 +8,9 @@ var buttonsHeight = 4;
 var buttonWidth;
 var buttonHeight;
 var buttons;
+var activeButtons = [];
+var inactiveButtons = [];
+var freq = 0;
 
 function setup(){
     let canvas = createCanvas(600,700);
@@ -21,31 +24,67 @@ function setup(){
         buttons[i] = new Array(buttonsWidth);
         for(let k = 0; k < buttonsWidth; k++){
             buttons[i][k] = new FastButton(k*buttonWidth, i*buttonHeight+buttonsStartHeight, buttonWidth, buttonHeight);
+            inactiveButtons.push(buttons[i][k]);
         }
     }
+
+    for(let i = 0; i < 3; i++){
+        let random = Math.floor(Math.random()*inactiveButtons.length);
+        activeButtons.push(inactiveButtons[random]);
+        activeButtons[activeButtons.length-1].state = true;
+        inactiveButtons.splice(random,1);
+    }
+
 }
 
 function draw(){
-    for(row of buttons){
-        for(button of row){
-            button.draw();
+    clear(0,0,width,height);
+    if(!lost){
+        freqBar();
+        for(row of buttons){
+            for(button of row){
+                button.draw();
+            }
+        }
+    } else {
+        fill("red");
+        rect(0,0,width,height);
+    }
+}
+
+function freqBar(){
+    fill("WHITE")
+    freq = (freq > 0)? freq-2: 0;
+    rect(10,80,200,10);
+    noStroke();
+    fill("BLACK");
+    rect(10,80,(freq%100)*2, 10);
+}
+
+function mousePressed(){
+    if(!(mouseX < 0 || mouseX > width || mouseY < buttonsStartHeight ||  mouseY > height)){
+        if(!lost){
+            let y = Math.floor((mouseY-buttonsStartHeight)/buttonHeight);
+            let x = Math.floor(mouseX/buttonWidth);
+            if(buttons[y][x].state == false){
+                lost = true;
+            } else {
+                freq += 30;
+                buttons[y][x].click();
+                buttons[y][x].draw();
+                newActive(activeButtons.indexOf(buttons[y][x]));
+            }
+        } else {
+            lost = false;
         }
     }
 }
 
-
-function mousePressed(){
-    if(!(mouseX < 0 || mouseX > width || mouseY < buttonsStartHeight ||  mouseY > height)){
-        let y = Math.floor((mouseY-buttonsStartHeight)/buttonHeight);
-        let x = Math.floor(mouseX/buttonWidth);
-        buttons[y][x].click();
-        buttons[y][x].draw();
-        newActive(x, y);
-    }
-}
-
-function newActive(x, y){
-    let newX = (x + Math.floor(Math.random()*(buttonsWidth)))%buttonsWidth;
-    let newY = (y + Math.floor(Math.random()*(buttonsHeight)))%buttonsHeight;
-    buttons[newY][newX].state = true;
+function newActive(index){
+    let inactiveIndex = Math.floor(Math.random()*inactiveButtons.length);
+    activeButtons.push(inactiveButtons[inactiveIndex]);
+    inactiveButtons.splice(inactiveIndex, 1)
+    inactiveButtons.push(activeButtons[index]);
+    activeButtons.splice(index,1);
+    activeButtons[activeButtons.length-1].state = true;
 }
